@@ -29,6 +29,59 @@
   </header>
 
   <!-- ================================================================
+       QUICK ACCESS — Google-like search + customizable app shortcuts
+       ================================================================ -->
+  <section class="quick-access" aria-label="Quick access">
+    <form class="quick-search-form" id="quickSearchForm" autocomplete="off">
+      <input
+        type="search"
+        class="quick-search-input"
+        id="quickSearchInput"
+        placeholder="Search Google or type a URL"
+        aria-label="Search Google or type a URL"
+      >
+      <button type="submit" class="quick-search-submit" aria-label="Search">
+        Search
+      </button>
+    </form>
+
+    <div class="shortcut-actions">
+      <button type="button" class="add-shortcut-btn" id="addShortcutBtn">+ Add shortcut</button>
+    </div>
+
+    <div class="app-shortcuts" id="appShortcuts" aria-label="App shortcuts"></div>
+
+    <div class="shortcut-menu" id="shortcutContextMenu" style="display:none" role="menu" aria-label="Shortcut options">
+      <button type="button" data-action="edit-shortcut" role="menuitem">Edit shortcut</button>
+      <button type="button" data-action="remove-shortcut" role="menuitem">Remove shortcut</button>
+    </div>
+
+    <div class="shortcut-modal" id="shortcutModal" style="display:none" aria-hidden="true">
+      <div class="shortcut-modal-card">
+        <h3 id="shortcutModalTitle">Add shortcut</h3>
+        <form id="shortcutForm" class="shortcut-form" autocomplete="off">
+          <label>
+            Name
+            <input type="text" id="shortcutNameInput" maxlength="28" required>
+          </label>
+          <label>
+            URL
+            <input type="text" id="shortcutUrlInput" placeholder="https://example.com" required>
+          </label>
+          <label>
+            Signal
+            <input type="text" id="shortcutIconInput" maxlength="2" placeholder="GH">
+          </label>
+          <div class="shortcut-modal-actions">
+            <button type="button" class="action-btn" id="shortcutCancelBtn">Cancel</button>
+            <button type="submit" class="action-btn close-tabs">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
        TAB OUT DUPES BANNER — appears when you have extra Tab Out tabs open
        Hidden by default; app.js shows it when dupeTabOutCount > 1
        ================================================================ -->
@@ -123,6 +176,7 @@
     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
   </svg>
   <span id="toastText"></span>
+  <button type="button" id="toastUndoBtn" class="toast-undo-btn" style="display:none">Undo</button>
 </div>
 
 <!-- Personal config (gitignored) — defines LOCAL_LANDING_PAGE_PATTERNS etc. -->
