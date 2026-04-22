@@ -81,6 +81,232 @@ header {
   text-transform: uppercase;
 }
 
+/* ---- Quick access (Google-like search + app shortcuts) ---- */
+.quick-access {
+  margin: -20px auto 28px;
+  max-width: 760px;
+}
+
+.quick-search-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--warm-gray);
+  border-radius: 999px;
+  padding: 7px 8px 7px 18px;
+  box-shadow: 0 2px 10px rgba(26, 22, 19, 0.04);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.quick-search-form:focus-within {
+  border-color: rgba(200, 113, 58, 0.45);
+  box-shadow: 0 8px 20px rgba(26, 22, 19, 0.08);
+}
+
+.quick-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.quick-search-input::placeholder {
+  color: var(--muted);
+}
+
+.quick-search-submit {
+  border: none;
+  background: rgba(200, 113, 58, 0.08);
+  color: var(--accent-amber);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.quick-search-submit:hover {
+  background: rgba(200, 113, 58, 0.14);
+}
+
+.app-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.shortcut-actions {
+  margin-top: 12px;
+}
+
+.add-shortcut-btn {
+  border: 1px dashed rgba(154, 145, 138, 0.55);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.add-shortcut-btn:hover {
+  border-color: var(--accent-amber);
+  color: var(--accent-amber);
+  background: rgba(200, 113, 58, 0.05);
+}
+
+.app-shortcut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--ink);
+  padding: 8px 6px;
+  border-radius: 10px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.app-shortcut:hover {
+  background: rgba(200, 113, 58, 0.06);
+  transform: translateY(-1px);
+}
+
+.app-shortcut.is-dragging {
+  opacity: 0.45;
+  transform: scale(0.96);
+}
+
+.app-shortcut.drag-over {
+  background: rgba(90, 122, 98, 0.12);
+  outline: 1px dashed rgba(90, 122, 98, 0.6);
+  outline-offset: -3px;
+}
+
+.app-shortcut-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--warm-gray);
+  background: var(--card-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--accent-slate);
+}
+
+.app-shortcut-label {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.shortcut-menu {
+  position: fixed;
+  z-index: 120;
+  min-width: 164px;
+  background: var(--card-bg);
+  border: 1px solid var(--warm-gray);
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(26, 22, 19, 0.12);
+  padding: 6px;
+}
+
+.shortcut-menu button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.shortcut-menu button:hover {
+  background: rgba(200, 113, 58, 0.07);
+}
+
+.shortcut-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 22, 19, 0.35);
+  z-index: 130;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.shortcut-modal-card {
+  width: min(380px, 100%);
+  background: var(--card-bg);
+  border: 1px solid var(--warm-gray);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 18px 40px rgba(26, 22, 19, 0.2);
+}
+
+.shortcut-modal-card h3 {
+  font-family: 'Newsreader', serif;
+  font-size: 24px;
+  font-weight: 400;
+  margin-bottom: 12px;
+}
+
+.shortcut-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shortcut-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.shortcut-form input {
+  border: 1px solid var(--warm-gray);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: #fff;
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+}
+
+.shortcut-form input:focus {
+  border-color: rgba(200, 113, 58, 0.6);
+}
+
+.shortcut-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
 /* ---- Tab cleanup banner ---- */
 .tab-cleanup-banner {
   background: linear-gradient(135deg, rgba(200, 113, 58, 0.04), rgba(200, 113, 58, 0.09));
@@ -598,6 +824,21 @@ header {
   color: var(--status-active);
 }
 
+.toast-undo-btn {
+  border: 1px solid rgba(248, 245, 240, 0.35);
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: transparent;
+  color: var(--paper);
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+
+.toast-undo-btn:hover {
+  background: rgba(248, 245, 240, 0.14);
+}
+
 /* ---- Footer ---- */
 footer {
   margin-top: 48px;
@@ -913,6 +1154,18 @@ footer { animation: fadeUp 0.5s ease 0.65s both; }
 
 /* On narrow screens, stack vertically */
 @media (max-width: 800px) {
+  .quick-access {
+    margin-top: -14px;
+  }
+  .quick-search-form {
+    padding-left: 14px;
+  }
+  .quick-search-submit {
+    padding: 8px 11px;
+  }
+  .app-shortcuts {
+    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  }
   .dashboard-columns {
     flex-direction: column;
   }
