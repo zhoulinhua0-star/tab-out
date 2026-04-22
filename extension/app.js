@@ -569,11 +569,13 @@ function normalizeSearchDestination(rawInput) {
 
 function openExternalUrl(url) {
   if (!url) return;
-  if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.create) {
-    chrome.tabs.create({ url });
+  if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.update) {
+    chrome.tabs.update({ url }).catch(() => {
+      window.location.assign(url);
+    });
     return;
   }
-  window.open(url, '_blank', 'noopener');
+  window.location.assign(url);
 }
 
 function buildShortcutId() {
@@ -627,7 +629,7 @@ function renderAppShortcuts() {
     const safeName = name.replace(/"/g, '&quot;');
     const safeUrl = url.replace(/"/g, '&quot;');
     return `
-      <a class="app-shortcut" href="${safeUrl}" target="_blank" rel="noopener" title="${safeName}" data-shortcut-id="${item.id}" draggable="true">
+      <a class="app-shortcut" href="${safeUrl}" title="${safeName}" data-shortcut-id="${item.id}" draggable="true">
         <span class="app-shortcut-icon" aria-hidden="true">${icon}</span>
         <span class="app-shortcut-label">${name}</span>
       </a>
