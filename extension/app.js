@@ -296,6 +296,20 @@ async function dismissSavedTab(id) {
   }
 }
 
+/**
+ * clearArchivedTab(id)
+ *
+ * Clears one archived (completed) tab from the archive list.
+ */
+async function clearArchivedTab(id) {
+  const { deferred = [] } = await chrome.storage.local.get('deferred');
+  const tab = deferred.find(t => t.id === id);
+  if (tab && tab.completed) {
+    tab.dismissed = true;
+    await chrome.storage.local.set({ deferred });
+  }
+}
+
 
 /* ----------------------------------------------------------------
    UI HELPERS
@@ -1352,11 +1366,20 @@ function renderDeferredItem(item) {
 function renderArchiveItem(item) {
   const ago = item.completedAt ? timeAgo(item.completedAt) : timeAgo(item.savedAt);
   return `
-    <div class="archive-item">
+    <div class="archive-item" data-deferred-id="${item.id}">
       <a href="${item.url}" target="_blank" rel="noopener" class="archive-item-title" title="${(item.title || '').replace(/"/g, '&quot;')}">
         ${item.title || item.url}
       </a>
       <span class="archive-item-date">${ago}</span>
+      <button
+        class="deferred-dismiss archive-clear-btn"
+        data-action="clear-archived"
+        data-deferred-id="${item.id}"
+        title="Clear archived tab"
+        style="opacity:0;padding:0;margin-left:2px"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+      </button>
     </div>`;
 }
 
@@ -1710,6 +1733,16 @@ document.addEventListener('click', async (e) => {
     return;
   }
 
+  // ---- Clear one archived tab item ----
+  if (action === 'clear-archived') {
+    const id = actionEl.dataset.deferredId;
+    if (!id) return;
+    e.stopPropagation();
+    await clearArchivedTab(id);
+    await renderDeferredColumn();
+    return;
+  }
+
   // ---- Close all tabs in a domain group ----
   if (action === 'close-domain-tabs') {
     const domainId = actionEl.dataset.domainId;
@@ -1843,6 +1876,23 @@ document.addEventListener('input', async (e) => {
   } catch (err) {
     console.warn('[tab-out] Archive search failed:', err);
   }
+});
+
+// ---- Archive item hover affordance — show clear (x) on hover ----
+document.addEventListener('mouseover', (e) => {
+  const item = e.target.closest('.archive-item');
+  if (!item) return;
+  const clearBtn = item.querySelector('.archive-clear-btn');
+  if (clearBtn) clearBtn.style.opacity = '0.35';
+});
+
+document.addEventListener('mouseout', (e) => {
+  const item = e.target.closest('.archive-item');
+  if (!item) return;
+  const next = e.relatedTarget;
+  if (next && item.contains(next)) return;
+  const clearBtn = item.querySelector('.archive-clear-btn');
+  if (clearBtn) clearBtn.style.opacity = '0';
 });
 
 
