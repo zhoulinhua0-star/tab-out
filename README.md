@@ -4,7 +4,9 @@
 
 Tab Out is a Chrome extension that replaces your new tab page with a dashboard of everything you have open. Tabs are grouped by domain, with homepages (Gmail, X, LinkedIn, etc.) pulled into their own group. Close tabs with a satisfying swoosh + confetti.
 
-No server. No account. No external API calls. Just a Chrome extension.
+This fork also ships **Tab Out for Edge**: the same behavior in a dedicated **`edge-tab-out/`** folder with a cooler visual theme for Chromium-based Microsoft Edge.
+
+No server. No account. No external API calls. Just a browser extension.
 
 ---
 
@@ -53,6 +55,30 @@ git clone https://github.com/zarazhangrui/tab-out.git
 **3. Open a new tab**
 
 You'll see Tab Out.
+
+---
+
+## Microsoft Edge (`edge-tab-out`)
+
+The Edge build mirrors the Chrome extension (Manifest V3, same features). Load **`edge-tab-out/`**, not `extension/`.
+
+**1. Open Edge extension settings**
+
+Go to `edge://extensions`.
+
+**2. Enable Developer mode**
+
+Use the **Developer mode** toggle in the left sidebar.
+
+**3. Load unpacked**
+
+Click **Load unpacked** and select the **`edge-tab-out`** folder inside your cloned repo.
+
+**4. Open a new tab**
+
+You should see **Tab Out for Edge** with the glacier-themed dashboard.
+
+**Note:** Only one extension can override the new tab page at a time. If another extension already replaces new tabs, disable its override or unload that extension first.
 
 ---
 
