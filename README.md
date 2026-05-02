@@ -32,6 +32,7 @@ The agent will walk you through it. Takes about 1 minute.
 - **Save for later** bookmark tabs to a checklist before closing them
 - **Localhost grouping** shows port numbers next to each tab so you can tell your vibe coding projects apart
 - **Expandable groups** show the first 8 tabs with a clickable "+N more"
+- **Background theme** — pick warm (classic orange paper), cool blue, or your own custom color; choice is saved locally in `chrome.storage.local`
 - **100% local** your data never leaves your machine
 - **Pure Chrome extension** no server, no Node.js, no npm, no setup beyond loading the extension
 
@@ -76,7 +77,7 @@ Click **Load unpacked** and select the **`edge-tab-out`** folder inside your clo
 
 **4. Open a new tab**
 
-You should see **Tab Out for Edge** with the glacier-themed dashboard.
+You should see **Tab Out for Edge** with the glacier-themed dashboard. The quick-search bar uses **Bing** for plain queries (aligned with Edge).
 
 **Note:** Only one extension can override the new tab page at a time. If another extension already replaces new tabs, disable its override or unload that extension first.
 
@@ -114,4 +115,4 @@ MIT
 
 ---
 
-Built by [Zara](https://x.com/zarazhangrui)
+Fork maintained as **Tab-out**. Original project by [Zara](https://x.com/zarazhangrui).

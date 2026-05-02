@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Tab Out for Edge",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Keep tabs on your tabs — Edge edition. New tab page that groups open tabs by domain and closes them with style. Fork of Tab Out for Chromium Edge.",
   "permissions": ["tabs", "activeTab", "storage"],
   "chrome_url_overrides": { "newtab": "index.html" },

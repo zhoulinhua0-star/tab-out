@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-tab-theme="warm">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,6 +25,15 @@
       <h1 id="greeting"></h1>
       <!-- "Friday, April 4, 2026" — written by getDateDisplay() in app.js -->
       <div class="date" id="dateDisplay"></div>
+    </div>
+    <div class="header-right theme-controls" aria-label="Page background">
+      <label class="theme-controls-label" for="tabThemeSelect">Background</label>
+      <select id="tabThemeSelect" class="theme-controls-select">
+        <option value="warm">Warm</option>
+        <option value="glacier">Cool blue</option>
+        <option value="custom">Custom…</option>
+      </select>
+      <input type="color" id="tabThemeColorInput" class="theme-controls-color" value="#f8f5f0" title="Pick background color" aria-label="Custom background color">
     </div>
   </header>
 
@@ -160,7 +169,7 @@
       </div>
     </div>
     <div class="last-refresh">
-      <span style="color: var(--muted); font-size: 11px;"><a href="https://github.com/zarazhangrui/tab-out" target="_top" style="color: var(--muted); text-decoration: underline; text-underline-offset: 2px;">Tab Out</a> by <a href="https://x.com/zarazhangrui" target="_top" style="color: var(--muted); text-decoration: underline; text-underline-offset: 2px;">Zara</a></span>
+      <span class="footer-brand">Tab-out</span>
     </div>
   </footer>
 

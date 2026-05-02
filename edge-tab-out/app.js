@@ -38,6 +38,118 @@ let dragMoved = false;
 // Google-like app shortcuts. Customize this list with your own apps.
 const DEFAULT_APP_SHORTCUTS = [];
 const APP_SHORTCUTS_STORAGE_KEY = 'appShortcuts';
+const TAB_THEME_STORAGE_KEY = 'tabThemePreset';
+const TAB_THEME_CUSTOM_KEY = 'tabThemeCustomPaper';
+const DEFAULT_TAB_THEME = 'glacier';
+
+let tabThemeControlsBound = false;
+
+function sanitizeHexColor(hex) {
+  if (typeof hex !== 'string') return null;
+  const m = /^#?([0-9A-Fa-f]{6})$/.exec(hex.trim());
+  return m ? '#' + m[1].toLowerCase() : null;
+}
+
+async function applyTabThemeFromStorage() {
+  let preset = DEFAULT_TAB_THEME;
+  let customHex = '#eef3fa';
+  try {
+    const stored = await chrome.storage.local.get([TAB_THEME_STORAGE_KEY, TAB_THEME_CUSTOM_KEY]);
+    if (
+      stored[TAB_THEME_STORAGE_KEY] === 'warm' ||
+      stored[TAB_THEME_STORAGE_KEY] === 'glacier' ||
+      stored[TAB_THEME_STORAGE_KEY] === 'custom'
+    ) {
+      preset = stored[TAB_THEME_STORAGE_KEY];
+    }
+    const hex = sanitizeHexColor(stored[TAB_THEME_CUSTOM_KEY]);
+    if (hex) customHex = hex;
+  } catch {
+    /* use defaults */
+  }
+
+  const html = document.documentElement;
+  html.dataset.tabTheme = preset;
+  if (preset === 'custom') {
+    html.style.setProperty('--tab-custom-paper', customHex);
+  } else {
+    html.style.removeProperty('--tab-custom-paper');
+  }
+
+  const sel = document.getElementById('tabThemeSelect');
+  const colorInput = document.getElementById('tabThemeColorInput');
+  if (sel) sel.value = preset;
+  if (colorInput) {
+    colorInput.value = customHex;
+    const show = preset === 'custom';
+    colorInput.style.opacity = show ? '1' : '0';
+    colorInput.style.width = show ? '36px' : '0';
+    colorInput.style.height = show ? '32px' : '0';
+    colorInput.style.padding = show ? '2px' : '0';
+    colorInput.style.borderWidth = show ? '1px' : '0';
+    colorInput.style.pointerEvents = show ? 'auto' : 'none';
+    colorInput.setAttribute('tabindex', show ? '0' : '-1');
+  }
+}
+
+function bindTabThemeControls() {
+  if (tabThemeControlsBound) return;
+  const sel = document.getElementById('tabThemeSelect');
+  const colorInput = document.getElementById('tabThemeColorInput');
+  if (!sel || !colorInput) return;
+  tabThemeControlsBound = true;
+
+  const syncColorPicker = () => {
+    const show = sel.value === 'custom';
+    colorInput.style.opacity = show ? '1' : '0';
+    colorInput.style.width = show ? '36px' : '0';
+    colorInput.style.height = show ? '32px' : '0';
+    colorInput.style.padding = show ? '2px' : '0';
+    colorInput.style.borderWidth = show ? '1px' : '0';
+    colorInput.style.pointerEvents = show ? 'auto' : 'none';
+    colorInput.setAttribute('tabindex', show ? '0' : '-1');
+  };
+
+  sel.addEventListener('change', async () => {
+    syncColorPicker();
+    const preset = sel.value;
+    let customHex = sanitizeHexColor(colorInput.value) || '#eef3fa';
+    try {
+      if (preset === 'custom') {
+        await chrome.storage.local.set({
+          [TAB_THEME_STORAGE_KEY]: 'custom',
+          [TAB_THEME_CUSTOM_KEY]: customHex,
+        });
+      } else {
+        await chrome.storage.local.set({ [TAB_THEME_STORAGE_KEY]: preset });
+      }
+    } catch {
+      /* ignore */
+    }
+    document.documentElement.dataset.tabTheme = preset;
+    if (preset === 'custom') {
+      document.documentElement.style.setProperty('--tab-custom-paper', customHex);
+    } else {
+      document.documentElement.style.removeProperty('--tab-custom-paper');
+    }
+  });
+
+  colorInput.addEventListener('input', async () => {
+    if (sel.value !== 'custom') return;
+    const hex = sanitizeHexColor(colorInput.value);
+    if (!hex) return;
+    try {
+      await chrome.storage.local.set({
+        [TAB_THEME_STORAGE_KEY]: 'custom',
+        [TAB_THEME_CUSTOM_KEY]: hex,
+      });
+    } catch {
+      /* ignore */
+    }
+    document.documentElement.dataset.tabTheme = 'custom';
+    document.documentElement.style.setProperty('--tab-custom-paper', hex);
+  });
+}
 
 /**
  * fetchOpenTabs()
@@ -567,9 +679,12 @@ function normalizeSearchDestination(rawInput) {
   const value = (rawInput || '').trim();
   if (!value) return '';
 
+  const bingSearch = q =>
+    `https://www.bing.com/search?q=${encodeURIComponent(q)}`;
+
   // If there are spaces, treat input as search query.
   if (/\s/.test(value)) {
-    return `https://www.google.com/search?q=${encodeURIComponent(value)}`;
+    return bingSearch(value);
   }
 
   // Accept explicit URL protocols directly.
@@ -582,8 +697,8 @@ function normalizeSearchDestination(rawInput) {
     return `https://${value}`;
   }
 
-  // Fallback to Google query.
-  return `https://www.google.com/search?q=${encodeURIComponent(value)}`;
+  // Fallback: Bing search (matches Edge default engine).
+  return bingSearch(value);
 }
 
 function openExternalUrl(url) {
@@ -1405,6 +1520,9 @@ function renderArchiveItem(item) {
  * 6. Renders the "Saved for Later" checklist
  */
 async function renderStaticDashboard() {
+  await applyTabThemeFromStorage();
+  bindTabThemeControls();
+
   // --- Header ---
   const greetingEl = document.getElementById('greeting');
   const dateEl     = document.getElementById('dateDisplay');
