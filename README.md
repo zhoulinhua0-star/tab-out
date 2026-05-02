@@ -4,7 +4,7 @@
 
 Tab Out is a Chrome extension that replaces your new tab page with a dashboard of everything you have open. Tabs are grouped by domain, with homepages (Gmail, X, LinkedIn, etc.) pulled into their own group. Close tabs with a satisfying swoosh + confetti.
 
-This fork also ships **Tab Out for Edge**: the same behavior in a dedicated **`edge-tab-out/`** folder with a cooler visual theme for Chromium-based Microsoft Edge.
+This fork also ships **Tab Out for Edge**: the same behavior in a dedicated **`edge-tab-out/`** folder.
 
 No server. No account. No external API calls. Just a browser extension.
 
