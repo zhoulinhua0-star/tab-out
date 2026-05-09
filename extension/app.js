@@ -35,6 +35,7 @@ let undoTimeout = null;
 let draggingShortcutId = null;
 let dragMoved = false;
 
+<<<<<<< HEAD
 /** Live dashboard refresh (idea 1): debounced full re-render when tabs change elsewhere */
 let liveDashboardListenersBound = false;
 let dashboardRefreshTimer = null;
@@ -43,6 +44,8 @@ const DASHBOARD_REFRESH_DEBOUNCE_MS = 150;
 /** Keyboard shortcuts for dashboard (idea 7) */
 let keyboardShortcutsBound = false;
 
+=======
+>>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
 // Google-like app shortcuts. Customize this list with your own apps.
 const DEFAULT_APP_SHORTCUTS = [];
 const APP_SHORTCUTS_STORAGE_KEY = 'appShortcuts';
@@ -799,6 +802,7 @@ function closeShortcutModal() {
   editingShortcutId = null;
 }
 
+<<<<<<< HEAD
 function isShortcutModalOpen() {
   const modal = document.getElementById('shortcutModal');
   return !!(modal && modal.style.display === 'flex');
@@ -955,6 +959,8 @@ function bindKeyboardShortcuts() {
   });
 }
 
+=======
+>>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
 function openShortcutModal(mode, shortcutId = null) {
   const modal = document.getElementById('shortcutModal');
   const form = document.getElementById('shortcutForm');
@@ -1826,8 +1832,11 @@ async function renderStaticDashboard() {
 
   // --- Render "Saved for Later" column ---
   await renderDeferredColumn();
+<<<<<<< HEAD
 
   await refreshRecentlyClosedPanel();
+=======
+>>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
 }
 
 async function renderDashboard() {
@@ -1862,6 +1871,7 @@ document.addEventListener('click', async (e) => {
     return;
   }
 
+<<<<<<< HEAD
   if (action === 'restore-session') {
     const sessionId = actionEl.dataset.sessionId;
     if (!sessionId) return;
@@ -1876,6 +1886,8 @@ document.addEventListener('click', async (e) => {
     return;
   }
 
+=======
+>>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
   // ---- Close duplicate Tab Out tabs ----
   if (action === 'close-tabout-dupes') {
     await closeTabOutDupes();
@@ -2143,6 +2155,7 @@ document.addEventListener('click', (e) => {
   }
 });
 
+<<<<<<< HEAD
 // ---- Recently closed panel toggle ----
 document.addEventListener('click', (e) => {
   const toggle = e.target.closest('#recentSessionsToggle');
@@ -2155,6 +2168,8 @@ document.addEventListener('click', (e) => {
   }
 });
 
+=======
+>>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
 // ---- Archive search — filter archived items as user types ----
 document.addEventListener('input', async (e) => {
   if (e.target.id !== 'archiveSearch') return;
@@ -2206,6 +2221,9 @@ document.addEventListener('mouseout', (e) => {
 /* ----------------------------------------------------------------
    INITIALIZE
    ---------------------------------------------------------------- */
+<<<<<<< HEAD
 bindLiveDashboardListeners();
 bindKeyboardShortcuts();
+=======
+>>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
 renderDashboard();

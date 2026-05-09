@@ -980,6 +980,7 @@ footer {
   color: var(--muted);
 }
 
+<<<<<<< HEAD
 /* ---- Recently closed (chrome.sessions) ---- */
 .recent-sessions-section {
   margin-top: 20px;
@@ -1045,6 +1046,8 @@ footer {
   white-space: nowrap;
 }
 
+=======
+>>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
 .refresh-btn {
   font-family: 'DM Sans', sans-serif;
   font-size: 11px;
