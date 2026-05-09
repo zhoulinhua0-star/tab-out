@@ -39,115 +39,62 @@ let dragMoved = false;
 const DEFAULT_APP_SHORTCUTS = [];
 const APP_SHORTCUTS_STORAGE_KEY = 'appShortcuts';
 const TAB_THEME_STORAGE_KEY = 'tabThemePreset';
-const TAB_THEME_CUSTOM_KEY = 'tabThemeCustomPaper';
+/** Ordered list — keep in sync with `#tabThemeSelect` options in index.html */
+const TAB_THEME_IDS = ['warm', 'glacier', 'forest', 'dusk', 'sand', 'lavender', 'midnight'];
 const DEFAULT_TAB_THEME = 'glacier';
 
 let tabThemeControlsBound = false;
 
-function sanitizeHexColor(hex) {
-  if (typeof hex !== 'string') return null;
-  const m = /^#?([0-9A-Fa-f]{6})$/.exec(hex.trim());
-  return m ? '#' + m[1].toLowerCase() : null;
+function normalizeStoredTabTheme(value) {
+  if (typeof value === 'string' && TAB_THEME_IDS.includes(value)) return value;
+  return DEFAULT_TAB_THEME;
 }
 
 async function applyTabThemeFromStorage() {
   let preset = DEFAULT_TAB_THEME;
-  let customHex = '#eef3fa';
   try {
-    const stored = await chrome.storage.local.get([TAB_THEME_STORAGE_KEY, TAB_THEME_CUSTOM_KEY]);
-    if (
-      stored[TAB_THEME_STORAGE_KEY] === 'warm' ||
-      stored[TAB_THEME_STORAGE_KEY] === 'glacier' ||
-      stored[TAB_THEME_STORAGE_KEY] === 'custom'
-    ) {
-      preset = stored[TAB_THEME_STORAGE_KEY];
+    const stored = await chrome.storage.local.get([
+      TAB_THEME_STORAGE_KEY,
+      'tabThemeCustomPaper',
+    ]);
+    const raw = stored[TAB_THEME_STORAGE_KEY];
+    preset = normalizeStoredTabTheme(raw);
+    const legacyCustomPaper = stored.tabThemeCustomPaper != null;
+    if (legacyCustomPaper) {
+      await chrome.storage.local.remove('tabThemeCustomPaper');
     }
-    const hex = sanitizeHexColor(stored[TAB_THEME_CUSTOM_KEY]);
-    if (hex) customHex = hex;
+    if (preset !== raw || legacyCustomPaper || raw === 'custom') {
+      await chrome.storage.local.set({ [TAB_THEME_STORAGE_KEY]: preset });
+    }
   } catch {
     /* use defaults */
   }
 
   const html = document.documentElement;
   html.dataset.tabTheme = preset;
-  if (preset === 'custom') {
-    html.style.setProperty('--tab-custom-paper', customHex);
-  } else {
-    html.style.removeProperty('--tab-custom-paper');
-  }
+  html.style.removeProperty('--tab-custom-paper');
 
   const sel = document.getElementById('tabThemeSelect');
-  const colorInput = document.getElementById('tabThemeColorInput');
   if (sel) sel.value = preset;
-  if (colorInput) {
-    colorInput.value = customHex;
-    const show = preset === 'custom';
-    colorInput.style.opacity = show ? '1' : '0';
-    colorInput.style.width = show ? '36px' : '0';
-    colorInput.style.height = show ? '32px' : '0';
-    colorInput.style.padding = show ? '2px' : '0';
-    colorInput.style.borderWidth = show ? '1px' : '0';
-    colorInput.style.pointerEvents = show ? 'auto' : 'none';
-    colorInput.setAttribute('tabindex', show ? '0' : '-1');
-  }
 }
 
 function bindTabThemeControls() {
   if (tabThemeControlsBound) return;
   const sel = document.getElementById('tabThemeSelect');
-  const colorInput = document.getElementById('tabThemeColorInput');
-  if (!sel || !colorInput) return;
+  if (!sel) return;
   tabThemeControlsBound = true;
 
-  const syncColorPicker = () => {
-    const show = sel.value === 'custom';
-    colorInput.style.opacity = show ? '1' : '0';
-    colorInput.style.width = show ? '36px' : '0';
-    colorInput.style.height = show ? '32px' : '0';
-    colorInput.style.padding = show ? '2px' : '0';
-    colorInput.style.borderWidth = show ? '1px' : '0';
-    colorInput.style.pointerEvents = show ? 'auto' : 'none';
-    colorInput.setAttribute('tabindex', show ? '0' : '-1');
-  };
-
   sel.addEventListener('change', async () => {
-    syncColorPicker();
-    const preset = sel.value;
-    let customHex = sanitizeHexColor(colorInput.value) || '#eef3fa';
+    const preset = normalizeStoredTabTheme(sel.value);
+    sel.value = preset;
     try {
-      if (preset === 'custom') {
-        await chrome.storage.local.set({
-          [TAB_THEME_STORAGE_KEY]: 'custom',
-          [TAB_THEME_CUSTOM_KEY]: customHex,
-        });
-      } else {
-        await chrome.storage.local.set({ [TAB_THEME_STORAGE_KEY]: preset });
-      }
+      await chrome.storage.local.set({ [TAB_THEME_STORAGE_KEY]: preset });
+      await chrome.storage.local.remove('tabThemeCustomPaper');
     } catch {
       /* ignore */
     }
     document.documentElement.dataset.tabTheme = preset;
-    if (preset === 'custom') {
-      document.documentElement.style.setProperty('--tab-custom-paper', customHex);
-    } else {
-      document.documentElement.style.removeProperty('--tab-custom-paper');
-    }
-  });
-
-  colorInput.addEventListener('input', async () => {
-    if (sel.value !== 'custom') return;
-    const hex = sanitizeHexColor(colorInput.value);
-    if (!hex) return;
-    try {
-      await chrome.storage.local.set({
-        [TAB_THEME_STORAGE_KEY]: 'custom',
-        [TAB_THEME_CUSTOM_KEY]: hex,
-      });
-    } catch {
-      /* ignore */
-    }
-    document.documentElement.dataset.tabTheme = 'custom';
-    document.documentElement.style.setProperty('--tab-custom-paper', hex);
+    document.documentElement.style.removeProperty('--tab-custom-paper');
   });
 }
 
