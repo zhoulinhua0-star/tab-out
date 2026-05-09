@@ -723,6 +723,34 @@ function normalizeShortcutUrl(rawUrl) {
   return `https://${value}`;
 }
 
+function escapeHtmlAttr(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeHtmlText(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/** Favicon URL for shortcut tiles (Chrome new-tab style imagery). */
+function shortcutFaviconUrl(pageUrl) {
+  try {
+    const u = new URL(pageUrl);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return '';
+    const host = u.hostname;
+    if (!host) return '';
+    return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(host)}&sz=64`;
+  } catch {
+    return '';
+  }
+}
+
 async function loadAppShortcuts() {
   const defaults = (typeof LOCAL_APP_SHORTCUTS !== 'undefined' && Array.isArray(LOCAL_APP_SHORTCUTS) && LOCAL_APP_SHORTCUTS.length > 0)
     ? LOCAL_APP_SHORTCUTS
@@ -762,13 +790,28 @@ function renderAppShortcuts() {
     const icon = (item.icon || name.charAt(0) || 'A').slice(0, 2).toUpperCase();
     const safeName = name.replace(/"/g, '&quot;');
     const safeUrl = url.replace(/"/g, '&quot;');
+    const faviconSrc = shortcutFaviconUrl(url);
+    const favIconClass = faviconSrc ? ' app-shortcut-icon--favicon' : '';
+    const favImg = faviconSrc
+      ? `<img class="app-shortcut-favicon" src="${escapeHtmlAttr(faviconSrc)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">`
+      : '';
     return `
       <a class="app-shortcut" href="${safeUrl}" title="${safeName}" data-shortcut-id="${item.id}" draggable="true">
-        <span class="app-shortcut-icon" aria-hidden="true">${icon}</span>
+        <span class="app-shortcut-icon${favIconClass}" aria-hidden="true">
+          ${favImg}
+          <span class="app-shortcut-fallback">${escapeHtmlText(icon)}</span>
+        </span>
         <span class="app-shortcut-label">${name}</span>
       </a>
     `;
   }).join('');
+
+  shortcutsEl.querySelectorAll('.app-shortcut-favicon').forEach((img) => {
+    img.addEventListener('error', () => {
+      const wrap = img.closest('.app-shortcut-icon');
+      if (wrap) wrap.classList.add('is-favicon-error');
+    });
+  });
 }
 
 function hideShortcutContextMenu() {

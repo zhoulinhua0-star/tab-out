@@ -295,11 +295,13 @@ header {
 }
 
 .app-shortcut-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: 1px solid var(--warm-gray);
-  background: var(--card-bg);
+  box-sizing: border-box;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -307,6 +309,28 @@ header {
   font-weight: 700;
   letter-spacing: 0.2px;
   color: var(--accent-slate);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.app-shortcut-icon--favicon .app-shortcut-fallback {
+  display: none;
+}
+
+.app-shortcut-icon--favicon.is-favicon-error .app-shortcut-favicon {
+  display: none;
+}
+
+.app-shortcut-icon--favicon.is-favicon-error .app-shortcut-fallback {
+  display: inline-flex;
+}
+
+.app-shortcut-favicon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
 }
 
 .app-shortcut-label {
