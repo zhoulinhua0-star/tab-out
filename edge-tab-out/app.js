@@ -35,17 +35,6 @@ let undoTimeout = null;
 let draggingShortcutId = null;
 let dragMoved = false;
 
-<<<<<<< HEAD
-/** Live dashboard refresh (idea 1): debounced full re-render when tabs change elsewhere */
-let liveDashboardListenersBound = false;
-let dashboardRefreshTimer = null;
-const DASHBOARD_REFRESH_DEBOUNCE_MS = 150;
-
-/** Keyboard shortcuts for dashboard (idea 7) */
-let keyboardShortcutsBound = false;
-
-=======
->>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
 // Google-like app shortcuts. Customize this list with your own apps.
 const DEFAULT_APP_SHORTCUTS = [];
 const APP_SHORTCUTS_STORAGE_KEY = 'appShortcuts';
@@ -810,165 +799,6 @@ function closeShortcutModal() {
   editingShortcutId = null;
 }
 
-<<<<<<< HEAD
-function isShortcutModalOpen() {
-  const modal = document.getElementById('shortcutModal');
-  return !!(modal && modal.style.display === 'flex');
-}
-
-function collapseRecentSessionsPanel() {
-  const toggle = document.getElementById('recentSessionsToggle');
-  const body = document.getElementById('recentSessionsBody');
-  if (body && body.style.display !== 'none') {
-    body.style.display = 'none';
-    if (toggle) toggle.classList.remove('open');
-  }
-}
-
-/**
- * Full dashboard refresh after transient UI closed — avoids stale modal/menu over new DOM.
- */
-async function performDashboardRefresh() {
-  closeShortcutModal();
-  hideShortcutContextMenu();
-  await renderDashboard();
-}
-
-function scheduleDashboardRefresh() {
-  if (dashboardRefreshTimer) clearTimeout(dashboardRefreshTimer);
-  dashboardRefreshTimer = setTimeout(async () => {
-    dashboardRefreshTimer = null;
-    await performDashboardRefresh();
-  }, DASHBOARD_REFRESH_DEBOUNCE_MS);
-}
-
-function bindLiveDashboardListeners() {
-  if (liveDashboardListenersBound) return;
-  liveDashboardListenersBound = true;
-
-  chrome.tabs.onCreated.addListener(scheduleDashboardRefresh);
-  chrome.tabs.onRemoved.addListener(scheduleDashboardRefresh);
-  chrome.tabs.onUpdated.addListener((_tabId, changeInfo) => {
-    if (changeInfo.url || changeInfo.title || changeInfo.status === 'complete') {
-      scheduleDashboardRefresh();
-    }
-  });
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') scheduleDashboardRefresh();
-  });
-}
-
-function escapeHtml(str) {
-  if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/"/g, '&quot;');
-}
-
-function isRestrictedBrowserUrl(url) {
-  if (!url) return true;
-  return (
-    url.startsWith('chrome://') ||
-    url.startsWith('chrome-extension://') ||
-    url.startsWith('about:') ||
-    url.startsWith('edge://') ||
-    url.startsWith('brave://')
-  );
-}
-
-/**
- * Populate “Recently closed” list (idea 4).
- */
-async function refreshRecentlyClosedPanel() {
-  const listEl = document.getElementById('recentSessionsList');
-  const emptyEl = document.getElementById('recentSessionsEmpty');
-  const section = document.getElementById('recentSessionsSection');
-  if (!listEl || !section) return;
-
-  try {
-    const sessions = await chrome.sessions.getRecentlyClosed({ maxResults: 15 });
-    const tabSessions = (sessions || []).filter(
-      s => s.sessionId && s.tab && s.tab.url && !isRestrictedBrowserUrl(s.tab.url)
-    );
-
-    if (emptyEl) {
-      emptyEl.textContent = 'Nothing to restore recently.';
-      emptyEl.style.display = tabSessions.length === 0 ? 'block' : 'none';
-    }
-
-    listEl.innerHTML = tabSessions
-      .map(s => {
-        const tab = s.tab;
-        const sid = s.sessionId || '';
-        const label = tab.title || tab.url || 'Untitled';
-        const safeTitle = escapeHtml(label);
-        return `
-      <button type="button" class="recent-session-row" data-action="restore-session" data-session-id="${escapeHtml(sid)}" title="${safeTitle}">
-        <span class="recent-session-title">${safeTitle}</span>
-      </button>`;
-      })
-      .join('');
-  } catch (err) {
-    console.warn('[tab-out] Recently closed failed:', err);
-    listEl.innerHTML = '';
-    if (emptyEl) {
-      emptyEl.textContent = 'Could not load recently closed.';
-      emptyEl.style.display = 'block';
-    }
-  }
-}
-
-function isTypingContext(el) {
-  if (!el) return false;
-  const tag = el.tagName;
-  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
-  if (el.isContentEditable) return true;
-  return false;
-}
-
-function bindKeyboardShortcuts() {
-  if (keyboardShortcutsBound) return;
-  keyboardShortcutsBound = true;
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      const menu = document.getElementById('shortcutContextMenu');
-      if (menu && menu.style.display !== 'none') {
-        hideShortcutContextMenu();
-        e.preventDefault();
-        return;
-      }
-      if (isShortcutModalOpen()) {
-        closeShortcutModal();
-        e.preventDefault();
-        return;
-      }
-      const quick = document.getElementById('quickSearchInput');
-      if (document.activeElement === quick) {
-        quick.blur();
-        e.preventDefault();
-        return;
-      }
-      collapseRecentSessionsPanel();
-      return;
-    }
-
-    if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      if (isTypingContext(document.activeElement)) return;
-      if (isShortcutModalOpen()) return;
-      e.preventDefault();
-      const input = document.getElementById('quickSearchInput');
-      if (input) {
-        input.focus();
-        input.select();
-      }
-    }
-  });
-}
-
-=======
->>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
 function openShortcutModal(mode, shortcutId = null) {
   const modal = document.getElementById('shortcutModal');
   const form = document.getElementById('shortcutForm');
@@ -1840,11 +1670,6 @@ async function renderStaticDashboard() {
 
   // --- Render "Saved for Later" column ---
   await renderDeferredColumn();
-<<<<<<< HEAD
-
-  await refreshRecentlyClosedPanel();
-=======
->>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
 }
 
 async function renderDashboard() {
@@ -1879,23 +1704,6 @@ document.addEventListener('click', async (e) => {
     return;
   }
 
-<<<<<<< HEAD
-  if (action === 'restore-session') {
-    const sessionId = actionEl.dataset.sessionId;
-    if (!sessionId) return;
-    try {
-      await chrome.sessions.restore(sessionId);
-      showToast('Tab restored');
-    } catch (err) {
-      console.warn('[tab-out] Restore failed:', err);
-      showToast('Could not restore tab');
-    }
-    await refreshRecentlyClosedPanel();
-    return;
-  }
-
-=======
->>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
   // ---- Close duplicate Tab Out tabs ----
   if (action === 'close-tabout-dupes') {
     await closeTabOutDupes();
@@ -2173,21 +1981,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-<<<<<<< HEAD
-// ---- Recently closed panel toggle ----
-document.addEventListener('click', (e) => {
-  const toggle = e.target.closest('#recentSessionsToggle');
-  if (!toggle) return;
-
-  toggle.classList.toggle('open');
-  const body = document.getElementById('recentSessionsBody');
-  if (body) {
-    body.style.display = body.style.display === 'none' ? 'block' : 'none';
-  }
-});
-
-=======
->>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
 // ---- Archive search — filter archived items as user types ----
 document.addEventListener('input', async (e) => {
   if (e.target.id !== 'archiveSearch') return;
@@ -2239,9 +2032,4 @@ document.addEventListener('mouseout', (e) => {
 /* ----------------------------------------------------------------
    INITIALIZE
    ---------------------------------------------------------------- */
-<<<<<<< HEAD
-bindLiveDashboardListeners();
-bindKeyboardShortcuts();
-=======
->>>>>>> d4edaa9023ce7562abbbd2aeb348b85627c2ad7b
 renderDashboard();
