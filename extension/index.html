@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-tab-theme="warm">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,18 +26,6 @@
       <!-- "Friday, April 4, 2026" — written by getDateDisplay() in app.js -->
       <div class="date" id="dateDisplay"></div>
     </div>
-    <div class="header-right theme-controls" aria-label="Page theme">
-      <label class="theme-controls-label" for="tabThemeSelect">Theme</label>
-      <select id="tabThemeSelect" class="theme-controls-select">
-        <option value="warm">Warm paper</option>
-        <option value="glacier">Cool blue</option>
-        <option value="forest">Forest</option>
-        <option value="dusk">Dusk</option>
-        <option value="sand">Sand</option>
-        <option value="lavender">Lavender</option>
-        <option value="midnight">Midnight</option>
-      </select>
-    </div>
   </header>
 
   <!-- ================================================================
@@ -51,24 +39,31 @@
         id="quickSearchInput"
         placeholder="Search Google or type a URL"
         aria-label="Search Google or type a URL"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-controls="openTabSearchResults"
+        aria-expanded="false"
       >
       <button type="submit" class="quick-search-submit" aria-label="Search">
         Search
       </button>
     </form>
+    <div class="open-tab-search-results" id="openTabSearchResults" role="listbox" aria-label="Search suggestions" hidden></div>
 
     <div class="shortcut-actions">
       <button type="button" class="add-shortcut-btn" id="addShortcutBtn">+ Add shortcut</button>
     </div>
 
-    <div class="app-shortcuts" id="appShortcuts" aria-label="App shortcuts"></div>
+    <div class="app-shortcuts" id="appShortcuts" aria-label="App shortcuts" aria-describedby="shortcutHelp"></div>
+    <p class="visually-hidden" id="shortcutHelp">Drag shortcuts to reorder. Keyboard users can hold Alt and use the arrow keys.</p>
+    <div class="visually-hidden" id="shortcutLiveRegion" aria-live="polite" aria-atomic="true"></div>
 
     <div class="shortcut-menu" id="shortcutContextMenu" style="display:none" role="menu" aria-label="Shortcut options">
       <button type="button" data-action="edit-shortcut" role="menuitem">Edit shortcut</button>
       <button type="button" data-action="remove-shortcut" role="menuitem">Remove shortcut</button>
     </div>
 
-    <div class="shortcut-modal" id="shortcutModal" style="display:none" aria-hidden="true">
+    <div class="shortcut-modal" id="shortcutModal" style="display:none" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="shortcutModalTitle">
       <div class="shortcut-modal-card">
         <h3 id="shortcutModalTitle">Add shortcut</h3>
         <form id="shortcutForm" class="shortcut-form" autocomplete="off">
@@ -78,7 +73,7 @@
           </label>
           <label>
             URL
-            <input type="text" id="shortcutUrlInput" placeholder="https://example.com" required>
+            <input type="text" id="shortcutUrlInput" inputmode="url" placeholder="https://example.com" required>
           </label>
           <label>
             Signal
@@ -182,7 +177,7 @@
      TOAST — floats above everything, used for action confirmations
      Hidden by default via CSS (opacity:0, translateY)
      ================================================================ -->
-<div class="toast" id="toast">
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true">
   <!-- Checkmark circle icon (Heroicons outline) -->
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -193,7 +188,7 @@
 
 <!-- Personal config (gitignored) — defines LOCAL_LANDING_PAGE_PATTERNS etc. -->
 <!-- If the file doesn't exist, that's fine — app.js uses sensible defaults. -->
-<script src="config.local.js" onerror="/* no personal config, that's fine */"></script>
+<script src="config.local.js"></script>
 
 <!-- Main dashboard logic — loads last so the DOM is ready -->
 <script src="app.js"></script>

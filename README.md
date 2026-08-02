@@ -2,11 +2,11 @@
 
 **Keep tabs on your tabs.**
 
-Tab Out is a Chrome extension that replaces your new tab page with a dashboard of everything you have open. Tabs are grouped by domain, with homepages (Gmail, X, LinkedIn, etc.) pulled into their own group. Close tabs with a satisfying swoosh + confetti.
+Tab Out is a Chrome and Edge extension that replaces the new tab page with a dashboard of everything you have open. Tabs are grouped by domain, with homepages (Gmail, X, LinkedIn, etc.) pulled into their own group. Find an existing tab, save something for later, or close a whole group without leaving the dashboard.
 
-This fork also ships **Tab Out for Edge**: the same behavior in a dedicated **`edge-tab-out/`** folder with a cooler visual theme for Chromium-based Microsoft Edge.
+This fork also ships **Tab Out for Edge**: the same behavior in a dedicated **`edge-tab-out/`** folder for Chromium-based Microsoft Edge.
 
-No server. No account. No external API calls. Just a browser extension.
+No server. No account. No tab or saved-page data leaves your browser.
 
 ---
 
@@ -15,7 +15,7 @@ No server. No account. No external API calls. Just a browser extension.
 Send your coding agent (Claude Code, Codex, etc.) this repo and say **"install this"**:
 
 ```
-https://github.com/zarazhangrui/tab-out
+https://github.com/zhoulinhua0-star/tab-out
 ```
 
 The agent will walk you through it. Takes about 1 minute.
@@ -28,13 +28,44 @@ The agent will walk you through it. Takes about 1 minute.
 - **Homepages group** pulls Gmail inbox, X home, YouTube, LinkedIn, GitHub homepages into one card
 - **Close tabs with style** with swoosh sound + confetti burst
 - **Duplicate detection** flags when you have the same page open twice, with one-click cleanup
+- **Safe bulk cleanup** keeps pinned, playing, active, and browser-detected captured tabs open, with a 7-second Undo for domain and global closes
 - **Click any tab to jump to it** across windows, no new tab opened
+- **Open-tab search** finds matching tabs as you type, with keyboard navigation before Google or Bing search
+- **Recently used ordering** keeps Homepages first and brings the most recently used domain cards forward
 - **Save for later** bookmark tabs to a checklist before closing them
 - **Localhost grouping** shows port numbers next to each tab so you can tell your vibe coding projects apart
 - **Expandable groups** show the first 8 tabs with a clickable "+N more"
-- **Background theme** — pick warm (classic orange paper), cool blue, or your own custom color; choice is saved locally in `chrome.storage.local`
-- **100% local** your data never leaves your machine
+- **Warm Paper design** — the original calm paper background and orange accent stay consistent in Chrome and Edge
+- **Smooth shortcut organizer** — drag shortcuts with live reflow, keep the dashboard compact with a two-row limit, and expand the rest with **More**
+- **Keyboard-friendly controls** — reorder shortcuts with Alt + Arrow keys, operate dialogs and menus without a pointer, and reduce motion automatically when requested by the OS
+- **Stable new-tab rendering** — opening or refreshing the dashboard does not run full-frame entrance animations
+- **Browser-local favicons** use Chromium's favicon cache instead of a third-party icon service
+- **Local data** — open-tab information stays in the browser and saved items use `chrome.storage.local`
 - **Pure Chrome extension** no server, no Node.js, no npm, no setup beyond loading the extension
+
+---
+
+## Everyday guide
+
+| When you want to… | Use… | What happens |
+|---|---|---|
+| Find a page you already opened | The top search box | Matching open tabs appear before the Google or Bing fallback |
+| Return to recent work | Recently used ordering | Homepages stays first; the remaining domain cards follow their most recently used tab |
+| Close one page | The **×** beside that tab | Only that exact tab closes |
+| Clean up one website | **Close N tabs** on its card | Ordinary tabs close; protected tabs stay open; Undo remains available for 7 seconds |
+| Clean up everything | The close button beside **Open tabs** | All closeable tabs are removed across domain cards, with the same protection and Undo behavior |
+| Keep something for later | The bookmark button beside a tab | The page moves into the Saved for later checklist |
+| Remove duplicate pages | **Close duplicates** | One copy remains open |
+| Open a frequent destination | An app shortcut | The shortcut opens directly; use **+ Add shortcut** to create more |
+| Organize shortcuts | Drag, or press **Alt + Arrow** | The new order is saved locally |
+
+Bulk cleanup automatically protects pinned tabs, tabs playing audio, the currently active tab, and tabs Chromium reports as being captured. The close button tells you how many tabs will close and how many are protected.
+
+Search keyboard controls:
+
+- **Up / Down** selects an open-tab result or the web-search fallback.
+- **Enter** opens the selected result. With no result selected, it performs the normal web search.
+- **Escape** closes the suggestions.
 
 ---
 
@@ -43,7 +74,7 @@ The agent will walk you through it. Takes about 1 minute.
 **1. Clone the repo**
 
 ```bash
-git clone https://github.com/zarazhangrui/tab-out.git
+git clone https://github.com/zhoulinhua0-star/tab-out.git
 ```
 
 **2. Load the Chrome extension**
@@ -77,7 +108,7 @@ Click **Load unpacked** and select the **`edge-tab-out`** folder inside your clo
 
 **4. Open a new tab**
 
-You should see **Tab Out for Edge** with the glacier-themed dashboard. The quick-search bar uses **Bing** for plain queries (aligned with Edge).
+You should see **Tab Out for Edge** with the Warm Paper dashboard. The quick-search bar uses **Bing** for plain queries (aligned with Edge).
 
 **Note:** Only one extension can override the new tab page at a time. If another extension already replaces new tabs, disable its override or unload that extension first.
 
@@ -87,14 +118,29 @@ You should see **Tab Out for Edge** with the glacier-themed dashboard. The quick
 
 ```
 You open a new tab
-  -> Tab Out shows your open tabs grouped by domain
-  -> Homepages (Gmail, X, etc.) get their own group at the top
+  -> Tab Out reads the current browser tabs locally
+  -> Homepages stays first; other domain cards follow recent use
+  -> Search checks existing tabs before Google or Bing
   -> Click any tab title to jump to it
-  -> Close groups you're done with (swoosh + confetti)
+  -> Close groups you're done with while protected tabs stay open
+  -> Use Undo within 7 seconds after a domain or global bulk close
   -> Save tabs for later before closing them
 ```
 
-Everything runs inside the Chrome extension. No external server, no API calls, no data sent anywhere. Saved tabs are stored in `chrome.storage.local`.
+Everything runs inside the extension. Saved tabs and shortcut order are stored in `chrome.storage.local`; browsing and tab data are not sent to a Tab Out server.
+
+---
+
+## Permissions
+
+| Permission | Why Tab Out needs it |
+|---|---|
+| `tabs` | Read, focus, create, and close the exact tabs shown on the dashboard |
+| `activeTab` | Work with the active browser tab when the user invokes the extension |
+| `storage` | Save shortcuts and the Saved for later checklist locally |
+| `favicon` | Display favicons from Chromium's local favicon cache |
+
+Tab Out does not request host permissions for the websites you visit.
 
 ---
 
@@ -106,6 +152,9 @@ Everything runs inside the Chrome extension. No external server, no API calls, n
 | Storage | chrome.storage.local |
 | Sound | Web Audio API (synthesized, no files) |
 | Animations | CSS transitions + JS confetti particles |
+| UI regression tests | Node.js + isolated Chrome DevTools harness (development only) |
+
+Chrome and Edge keep separate extension folders, but their dashboard logic is intentionally kept in sync. See [CHANGELOG.md](CHANGELOG.md) for the release history and current unreleased improvements.
 
 ---
 
