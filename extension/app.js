@@ -516,10 +516,33 @@ function showToast(message, options = {}) {
 }
 
 /**
- * checkAndShowEmptyState()
+ * renderEmptyState()
  *
- * Shows a cheerful "Inbox zero" message when all domain cards are gone.
+ * Keeps the cheerful "Inbox zero" state visible until tabs return.
  */
+function renderEmptyState() {
+  const missionsEl = document.getElementById('openTabsMissions');
+  if (!missionsEl) return;
+
+  if (!missionsEl.querySelector('.missions-empty-state')) {
+    missionsEl.innerHTML = `
+      <div class="missions-empty-state">
+        <div class="empty-checkmark">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+          </svg>
+        </div>
+        <div class="empty-title">Inbox zero, but for tabs.</div>
+        <div class="empty-subtitle">You're free.</div>
+      </div>
+    `;
+  }
+
+  const countEl = document.getElementById('openTabsSectionCount');
+  if (countEl) countEl.textContent = '0 domains';
+}
+
+/** Shows the empty state after the last visible domain card closes. */
 function checkAndShowEmptyState() {
   const missionsEl = document.getElementById('openTabsMissions');
   if (!missionsEl) return;
@@ -527,20 +550,7 @@ function checkAndShowEmptyState() {
   const remaining = missionsEl.querySelectorAll('.mission-card:not(.closing)').length;
   if (remaining > 0) return;
 
-  missionsEl.innerHTML = `
-    <div class="missions-empty-state">
-      <div class="empty-checkmark">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-        </svg>
-      </div>
-      <div class="empty-title">Inbox zero, but for tabs.</div>
-      <div class="empty-subtitle">You're free.</div>
-    </div>
-  `;
-
-  const countEl = document.getElementById('openTabsSectionCount');
-  if (countEl) countEl.textContent = '0 domains';
+  renderEmptyState();
 }
 
 /**
@@ -1946,7 +1956,9 @@ async function renderStaticDashboard() {
     openTabsMissionsEl.innerHTML = domainGroups.map(g => renderDomainCard(g)).join('');
     openTabsSection.style.display = 'block';
   } else if (openTabsSection) {
-    openTabsSection.style.display = 'none';
+    if (openTabsSectionTitle) openTabsSectionTitle.textContent = 'Open tabs';
+    openTabsSection.style.display = 'block';
+    renderEmptyState();
   }
 
   // --- Footer stats ---

@@ -95,7 +95,7 @@ const mockBrowserApis = String.raw`
   const onUpdated = listeners();
   const onActivated = listeners();
 
-  window.__tabOutTest = { removed: [], created: [], updated: [], storage, errors: [] };
+  window.__tabOutTest = { removed: [], created: [], updated: [], storage, tabs, errors: [] };
   window.addEventListener('error', event => {
     if (event instanceof ErrorEvent) window.__tabOutTest.errors.push(event.message);
   });
@@ -366,6 +366,38 @@ await evaluate(`(() => {
 await waitFor(`window.__tabOutTest.updated.some(entry => entry.id === 7 && entry.updates.active === true)`);
 assert.equal(await evaluate(`document.getElementById('openTabSearchResults').hidden`), true);
 
+await evaluate(`(() => {
+  for (const tab of window.__tabOutTest.tabs) {
+    if (tab.url.startsWith('chrome-extension://')) continue;
+    tab.pinned = false;
+    tab.audible = false;
+    tab.active = false;
+    tab.mutedInfo = null;
+  }
+  return refreshDashboardQuietly();
+})()`);
+await waitFor(`document.querySelector('[data-action="close-all-open-tabs"]')?.textContent.includes('Close 5 tabs')`);
+await evaluate(`document.querySelector('[data-action="close-all-open-tabs"]').click()`);
+await waitFor(`document.querySelector('.missions-empty-state')?.isConnected === true`);
+await new Promise(resolve => setTimeout(resolve, 700));
+const emptyState = await evaluate(`(() => ({
+  sectionDisplay: getComputedStyle(document.getElementById('openTabsSection')).display,
+  title: document.querySelector('.missions-empty-state .empty-title')?.textContent,
+  subtitle: document.querySelector('.missions-empty-state .empty-subtitle')?.textContent,
+  count: document.getElementById('openTabsSectionCount').textContent,
+  cards: document.querySelectorAll('#openTabsMissions .mission-card').length,
+}))()`);
+assert.deepEqual(emptyState, {
+  sectionDisplay: 'block',
+  title: 'Inbox zero, but for tabs.',
+  subtitle: "You're free.",
+  count: '0 domains',
+  cards: 0,
+});
+await evaluate(`document.getElementById('toastUndoBtn').click()`);
+await waitFor(`document.querySelectorAll('#openTabsMissions .mission-card').length > 0`);
+assert.equal(await evaluate(`Boolean(document.querySelector('.missions-empty-state'))`), false);
+
 await command('Emulation.setDeviceMetricsOverride', {
   width: 375,
   height: 812,
@@ -442,5 +474,5 @@ assert.deepEqual(reloadRender, {
 const runtimeErrors = await evaluate(`window.__tabOutTest.errors`);
 assert.deepEqual(runtimeErrors, []);
 
-console.log(JSON.stringify({ wideLayout, expandedLayout, pointerMovedIndex, narrowLayout, responsiveLayouts, domainRemoved, singleRemoved, bulkRemoved, protectedReasons, openTabSearch, reloadRender, runtimeErrors }, null, 2));
+console.log(JSON.stringify({ wideLayout, expandedLayout, pointerMovedIndex, narrowLayout, responsiveLayouts, domainRemoved, singleRemoved, bulkRemoved, protectedReasons, openTabSearch, emptyState, reloadRender, runtimeErrors }, null, 2));
 socket.close();

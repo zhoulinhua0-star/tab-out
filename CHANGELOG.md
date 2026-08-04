@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Restored the persistent "Inbox zero" completion state after the last tabs close.
 - Added a 7-second Undo for domain and global bulk tab closes.
 - Protected pinned, audible, active, and browser-detected captured tabs from bulk cleanup.
 - Added open-tab matches to quick search, including keyboard selection and the existing Google/Bing fallback.
